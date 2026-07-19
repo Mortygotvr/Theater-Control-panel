@@ -29,6 +29,51 @@
 
 ---
 
+## 🧩 Creating Your Own TCP Module
+
+You can extend Theater Control Panel by building custom `.tcp` JavaScript modules placed inside the `modules/` directory.
+
+### Quick Example (`modules/my_module.tcp`):
+
+```javascript
+// @theater-tcp-module
+(function() {
+    window.TheaterController.registerModule("my_module", {
+        name: "My Custom Module",
+        description: "Custom stream integration and trigger actions.",
+        configFields: [
+            { id: "api_key", label: "API Key", type: "password", default: "" }
+        ],
+        onLoad(config) {
+            console.log("[My Module] Loaded with config:", config);
+        },
+        onUnload() {
+            console.log("[My Module] Unloaded.");
+        }
+    });
+
+    // Register a custom action trigger command
+    window.TheaterController.registerCommand(
+        "my_action",
+        async (inputs, matches, payload) => {
+            const msg = window.TheaterController.replaceVariables(inputs.messageText, matches, payload);
+            console.log("Executed action:", msg);
+        },
+        {
+            label: "Send Custom Alert",
+            fields: [
+                { id: "messageText", label: "Message", type: "text", default: "Hello {username}!" }
+            ]
+        },
+        "my_module"
+    );
+})();
+```
+
+For full documentation on registering triggers, context providers, template variables (`{username}`, `{1}`), and hidden browser webview automation, see the **[TCP Module Development Guide](https://github.com/Mortygotvr/Theater-Control-panel/blob/main/modules/README.md)**.
+
+---
+
 ## 🔒 License
 
 Licensed under the **MIT License (with Non-Commercial / No-Resale Restriction)**. See [LICENSE](https://github.com/Mortygotvr/Theater-Control-panel/blob/main/LICENSE) for details.
