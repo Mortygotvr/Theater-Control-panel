@@ -21,6 +21,33 @@
 
 ---
 
+## 📦 Included TCP Modules
+
+Theater Control Panel comes pre-packaged with 18 `.tcp` modules located in the `modules/` directory:
+
+| Module | Description | Notes & Requirements |
+| :--- | :--- | :--- |
+| **Beat Saber** (`beatsaber.tcp`) | Live Beat Saber song stats, performance metrics, and HUD overlay. | ⚠️ **Requires [Sira HTTP Status Mod](https://github.com/hryu/DataPuller) installed in Beat Saber.** |
+| **Twitch Chat** (`twitch_chat.tcp`) | Live Twitch chat dock with message controls and moderation tools. | |
+| **Twitch API** (`twitch_api.tcp`) | Twitch Helix API, Channel Points rewards, and subscription event triggers. | |
+| **Kick Chat** (`kick_chat.tcp`) | Live Kick chat stream dock with viewer count tracking. | |
+| **Kick API** (`kick_api.tcp`) | Kick platform API integration and follower/sub triggers. | |
+| **Kick Commands** (`kick_command.tcp`) | Kick chat command triggers and automated moderation actions. | |
+| **OBS Controls** (`obs_controls.tcp`) | OBS Studio scene switcher, source visibility toggle, and stream/recording controls. | Requires OBS WebSocket enabled. |
+| **Discord** (`discord.tcp`) | Discord bot integration, webhook triggers, and status updates. | |
+| **Bluesky** (`bsky.tcp`) | Bluesky social network feed integration and post triggers. | |
+| **Patreon** (`patreon.tcp`) | Patreon supporter alerts and subscription tier status. | |
+| **X (Twitter)** (`x.tcp`) | X (Twitter) social integration and automated post triggers. | |
+| **LocalShock** (`localshock.tcp`) | PiShock / LocalShock haptic feedback integration for stream events. | |
+| **Theatre 360** (`theatre360.tcp`) | Panoramic and 3D camera controls for 3D stream overlays. | |
+| **Web Docks** (`web_docks.tcp`) | Custom browser docks to embed any web page into your layout. | |
+| **WebSocket Connector** (`websocket_connector.tcp`) | Custom WebSocket client/server connector to relay events to external apps. | |
+| **HTML Widget** (`html.tcp`) | Render custom HTML/CSS widgets and dynamic status panels directly in your layout. | |
+| **JSON Viewer** (`json_viewer.tcp`) | Live JSON data inspector and event payload debugger. | |
+| **Test Safety** (`test_safety.tcp`) | Test trigger emulator for simulating chat events and actions safely. | |
+
+---
+
 ## 🚀 Quick Start
 
 1. Download and run `ControlPanel.exe`.
