@@ -16,14 +16,14 @@
 
 - 🧩 **Modular Dock Layout System**: Customize docks for chat streams, OBS controls, social media feeds, and web docks.
 - 💬 **Multi-Platform Modules**: Pre-built TCP modules for Twitch, Kick, Discord, Bluesky, Patreon, X (Twitter), and BeatSaber.
-- 🖥️ **Desktop Launcher & Web App**: Run directly as a desktop app (`ControlPanel.exe`) or open [control_panel.html](file:///c:/Users/death/repo/Control%20Panel/control_panel.html) in your browser.
+- 🖥️ **Desktop Application**: Run directly as a desktop application (`ControlPanel.exe`).
 - 🎭 **Custom Overlays**: Includes pre-packaged HTML overlays and Lua script integration for OBS Studio.
 
 ---
 
 ## 🚀 Quick Start
 
-1. Run `ControlPanel.exe` (or open [control_panel.html](file:///c:/Users/death/repo/Control%20Panel/control_panel.html) in any web browser).
+1. Download and run `ControlPanel.exe`.
 2. Drag, dock, and customize your layout modules.
 3. Connect your stream accounts or local WebSocket servers (e.g. Theater Reader & OBS Studio).
 
