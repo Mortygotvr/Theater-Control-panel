@@ -1,0 +1,101 @@
+[config]
+name = Web Docks
+description = Launch custom websites into dockable split panels using native Tauri webviews.
+
+[html]
+<div class="module-container">
+    <div style="background: var(--panel); padding: 15px; border-radius: 6px; border: 1px solid var(--border); margin-bottom: 15px;">
+        <h3 style="margin-top: 0;">Spawn Web Dock</h3>
+        <p style="color:#aaa; font-size:14px; margin-bottom: 15px;">Enter a URL to launch it into one of your empty split panels.</p>
+        
+        <div style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px;">URL:</label>
+            <input type="text" id="webdock-url" placeholder="https://twitch.tv/popout/..." style="width: 100%; padding: 8px; background: #1a1a1a; border: 1px solid #333; color: white; border-radius: 4px; font-family: 'Outfit', sans-serif;">
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px;">Target Panel ID:</label>
+            <select id="webdock-target" style="width: 100%; padding: 8px; background: #1a1a1a; border: 1px solid #333; color: white; border-radius: 4px; font-family: 'Outfit', sans-serif;">
+                <option value="">(Select an empty panel)</option>
+            </select>
+            <div style="margin-top: 5px; font-size: 12px; color: #888;">Split a window to create an empty panel!</div>
+        </div>
+
+        <button onclick="spawnWebDock()" style="background: var(--accent); color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;">Launch in Dock</button>
+    </div>
+</div>
+
+[js]
+function refreshWebDockTargets() {
+    const select = document.getElementById('webdock-target');
+    if (!select || !window.splitEngine) return;
+    
+    // Clear existing options
+    select.innerHTML = '';
+    
+    // Find all leaf nodes
+    const leaves = document.querySelectorAll('.split-leaf');
+    let hasEmpty = false;
+    
+    leaves.forEach(leaf => {
+        const nodeId = leaf.dataset.nodeId;
+        // Check if it's currently occupied by native webview or empty
+        const isOccupied = window.splitEngine.webviews[nodeId];
+        const isCoreTab = document.querySelector(`[data-node-id="\${nodeId}"] #tab-control-deck`) || 
+                          document.querySelector(`[data-node-id="\${nodeId}"] #tab-modules`);
+                          
+        if (!isCoreTab) {
+            hasEmpty = true;
+            const opt = document.createElement('option');
+            opt.value = nodeId;
+            opt.textContent = isOccupied ? `Replace Webview in \${nodeId}` : `Empty Panel (\${nodeId})`;
+            select.appendChild(opt);
+        }
+    });
+    
+    if (!hasEmpty) {
+        select.innerHTML = '<option value="">No empty panels. Split a window first!</option>';
+    }
+}
+
+// Hook into Split Engine renders to refresh our dropdown
+const originalRender = window.splitEngine ? window.splitEngine.render : null;
+if (originalRender) {
+    window.splitEngine.render = function() {
+        originalRender.apply(this, arguments);
+        refreshWebDockTargets();
+    };
+}
+
+function spawnWebDock() {
+    const url = document.getElementById('webdock-url').value;
+    const targetId = document.getElementById('webdock-target').value;
+    
+    if (!url) {
+        alert("Please enter a URL.");
+        return;
+    }
+    
+    if (!targetId) {
+        alert("Please select a target panel. You may need to split a window first.");
+        return;
+    }
+    
+    let finalUrl = url.trim();
+    if (finalUrl.match(/^[a-zA-Z]:\\/) || finalUrl.match(/^[a-zA-Z]:\//)) {
+        // Windows absolute path
+        finalUrl = 'file:///' + finalUrl.replace(/\\/g, '/');
+    } else if (!finalUrl.startsWith('http') && !finalUrl.startsWith('file://') && !finalUrl.startsWith('tcp://')) {
+        finalUrl = 'https://' + finalUrl;
+    }
+    
+    if (window.splitEngine) {
+        window.splitEngine.loadUrlInNode(targetId, finalUrl);
+        logMsg(`[Web Docks] Launched ${finalUrl} into panel ${targetId}`);
+    } else {
+        alert("Split engine not loaded.");
+    }
+}
+
+// Initial populate
+setTimeout(refreshWebDockTargets, 1000);

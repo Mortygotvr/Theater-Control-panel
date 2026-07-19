@@ -1,0 +1,51 @@
+// @theater-tcp-module
+(function() {
+    const MODULE_ID = "test_safety_module";
+
+    // Expose the crash function globally so the description button can click it
+    window.fakeTestModuleCrash = function() {
+        // Set the crash flag to "loading" to simulate a module that crashed during init on next boot
+        localStorage.setItem("module_crash_modules/test_safety.tcp", "loading");
+        
+        // Log a simulated critical crash and refresh
+        console.error("[Test Safety] Simulating critical initialization crash!");
+        location.reload();
+    };
+
+    window.TheaterController.registerModule(MODULE_ID, {
+        name: "Safety & Corruption Test Module",
+        description: `Allows testing of trigger/command safety preservation when unloaded. <br><br><button class="btn-red" onclick="window.fakeTestModuleCrash()" style="padding: 4px 10px; font-size: 0.8em; cursor: pointer; border-radius: 4px; border: none; font-weight: bold; background: #d32f2f; color: white;">💥 Fake Corrupt Init Crash</button>`,
+        configFields: [
+            { id: "test_setting", label: "Test Config Key Value", type: "text", default: "Working Value" }
+        ],
+        onLoad(moduleConfig) {
+            logMsg(`[Test Safety] Loaded successfully. Test setting is: "${moduleConfig.test_setting}"`);
+        },
+        onUnload() {
+            logMsg("[Test Safety] Unloaded successfully.");
+        }
+    });
+
+    // Register a custom command
+    window.TheaterController.registerCommand("test_safety_command", (inputs) => {
+        logMsg(`[Test Safety] Executing test_safety_command with intensity: ${inputs.intensity}, duration: ${inputs.duration}ms`);
+    }, {
+        label: "Test Safety: Execute Action",
+        fields: [
+            { id: "intensity", label: "Intensity (0-100)", type: "number", default: 50 },
+            { id: "duration", label: "Duration (ms)", type: "number", default: 1000 }
+        ]
+    }, MODULE_ID);
+
+    // Register a custom trigger
+    window.TheaterController.registerTrigger("test_safety_trigger", (eventData, matchConfig) => {
+        logMsg(`[Test Safety] Matching event: ${JSON.stringify(eventData)} with match pattern: ${matchConfig.matchPattern}`);
+        return true;
+    }, {
+        label: "Test Safety: Custom Event Trigger",
+        fields: [
+            { id: "matchPattern", label: "Match Pattern", type: "text", default: "safety_ok" }
+        ]
+    }, MODULE_ID);
+
+})();
