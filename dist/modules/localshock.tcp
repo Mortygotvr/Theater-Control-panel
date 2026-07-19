@@ -1,0 +1,89 @@
+// @theater-tcp-module
+(function() {
+    const MODULE_ID = "localshock_controller";
+
+    window.TheaterController.registerModule(MODULE_ID, {
+        name: "LocalShock Controller",
+        description: "Controls local ESP32 collars directly via the Local HTTP API.",
+        configFields: [
+            { id: "base_url", label: "LocalShock Base URL (e.g. http://localhost:8081)", type: "text", default: "http://localhost:8081" }
+        ],
+        onLoad(moduleConfig) {
+            logMsg(`[LocalShock] Loaded with Base URL: ${moduleConfig.base_url}`);
+        },
+        onUnload() {
+            logMsg("[LocalShock] Unloaded.");
+        }
+    });
+
+    function getBaseUrl() {
+        const mod = window.TheaterController.modules[MODULE_ID];
+        if (mod && mod.config && mod.config.base_url) {
+            return mod.config.base_url.replace(/\/$/, "");
+        }
+        return "http://localhost:8081";
+    }
+
+    async function sendCommand(type, inputs) {
+        const baseUrl = getBaseUrl();
+        const url = `${baseUrl}/command`;
+        const payload = {
+            model: "caixianlin",
+            id: Number(inputs.collarId),
+            type: type,
+            intensity: Number(inputs.intensity),
+            durationMs: Number(inputs.duration)
+        };
+
+        logMsg(`[LocalShock] Sending POST /command -> Model: ${payload.model}, ID: ${payload.id}, Type: ${payload.type}, Int: ${payload.intensity}, Dur: ${payload.durationMs}ms`);
+        try {
+            const res = await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            if (!res.ok) {
+                const text = await res.text();
+                throw new Error(text || res.statusText);
+            }
+            const json = await res.json();
+            logMsg(`[LocalShock] Response: ${JSON.stringify(json)}`);
+        } catch (e) {
+            logMsg(`[LocalShock Error] Command failed: ${e.message || e}`, true);
+        }
+    }
+
+    window.TheaterController.registerCommand("localshock_shock", (inputs) => {
+        return sendCommand("shock", inputs);
+    }, {
+        label: "LocalShock: Shock",
+        fields: [
+            { id: "collarId", label: "Collar ID", type: "number", default: 1 },
+            { id: "intensity", label: "Intensity (0-255)", type: "number", default: 50 },
+            { id: "duration", label: "Duration (ms)", type: "number", default: 1000 }
+        ]
+    }, MODULE_ID);
+
+    window.TheaterController.registerCommand("localshock_vibrate", (inputs) => {
+        return sendCommand("vibrate", inputs);
+    }, {
+        label: "LocalShock: Vibrate",
+        fields: [
+            { id: "collarId", label: "Collar ID", type: "number", default: 1 },
+            { id: "intensity", label: "Intensity (0-255)", type: "number", default: 50 },
+            { id: "duration", label: "Duration (ms)", type: "number", default: 1000 }
+        ]
+    }, MODULE_ID);
+
+    window.TheaterController.registerCommand("localshock_sound", (inputs) => {
+        return sendCommand("sound", inputs);
+    }, {
+        label: "LocalShock: Play Sound",
+        fields: [
+            { id: "collarId", label: "Collar ID", type: "number", default: 1 },
+            { id: "intensity", label: "Intensity (0-255)", type: "number", default: 50 },
+            { id: "duration", label: "Duration (ms)", type: "number", default: 1000 }
+        ]
+    }, MODULE_ID);
+
+})();
